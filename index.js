@@ -23,18 +23,20 @@ let dbUsers = [
 const express = require('express')
 const app = express()
 const port = 3000
+const jwt = require('jsonwebtoken')
+
 
 app.use(express.json())
 
 
 app.post('/login', (req, res) => {
   console.log(req.body)
-  let result = login (
-    req.body.username,
-    req.body.password
-  )
-  res.send(result)
+
+  let result = login(req.body.username, req.body.password)
+  let token = generateToken(result)
+  res.send(token)
 })
+
 
 app.post('/register', (req, res) => {
   console.log(req.body)
@@ -47,7 +49,7 @@ app.post('/register', (req, res) => {
   res.send(result)
 })
 
-app.get('/', (req, res) => {
+app.get('/', verifyToken, (req, res) => {
   res.send('Hello UTeM!')
 })
 
@@ -81,6 +83,138 @@ function register (requsername, reqpassword, reqname, reqemail) {
       email: reqemail,
   })
 }
+
+function generateToken(userData)
+{
+  const token = jwt.sign
+  (
+    userData,
+    'inipassword',
+    {expiresIn: 60} 
+  );
+  return token
+}
+
+function verifyToken(req,res,next) {
+  let header = req.headers.authorization
+  console.log(header)
+
+  let token = header.split(' ')[1]
+
+  jwt.verify(token, 'inipassword', function(err, decoded){
+    if(err) {
+      res.send("Invalid Token")
+    }
+
+  req.user = decoded 
+  next()
+
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
